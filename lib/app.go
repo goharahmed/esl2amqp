@@ -327,6 +327,7 @@ func ExecuteCommand(params CommandData) (*eventsocket.Event, error) {
 	data.Command = params.Command
 	data.Host = params.Host
 	data.ID = params.ID
+	log.Printf("[ExecuteComman] Command:%+v LiveServers:%+v\n", params, LiveServers)
 	response, err := LiveServers[params.Host].Conn.Send(params.Command)
 	return response, err
 
