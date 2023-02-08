@@ -17,6 +17,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("[MAIN] Config Loaded:%+v\n", lib.LConfig)
 	go lib.ConnectWithFsServers(lib.LConfig)
 
 	//log.Println("[Initialization] Configurations: %+v\n", lib.Config)
