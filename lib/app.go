@@ -190,7 +190,7 @@ func LoadfreeSWITCHBoxes() []helpers.FSServers {
 	}
 	copy(Servers, newServers)
 	//WARNING !! Triggering reconnection for all servers !!
-	fsServerReload <- "reload"
+	//fsServerReload <- "reload"
 	return Servers
 }
 
