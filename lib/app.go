@@ -170,28 +170,23 @@ func LoadfreeSWITCHBoxes(cfgs helpers.Config) []helpers.FSServers {
 	temp := helpers.FSServers{NodeName: cfgs.FreeSWITCHInstance.Host, Host: cfgs.FreeSWITCHInstance.Host, ESLEventsList: cfgs.FreeSWITCHInstance.EventList, ESLFormat: "json", ESLPassword: cfgs.FreeSWITCHInstance.Password, ESLPort: cfgs.FreeSWITCHInstance.Port}
 
 	AllServers = append(AllServers, temp)
-	var newServers []helpers.FSServers
-	for _, server := range AllServers {
+	for i, server := range AllServers {
 		if server.Host != "" {
 			if server.ESLEventsList == "" {
-				server.ESLEventsList = "ALL"
+				AllServers[i].ESLEventsList = "ALL"
 			}
 			if server.ESLFormat == "" {
-				server.ESLFormat = "json"
+				AllServers[i].ESLFormat = "json"
 			}
 			if server.ESLPassword == "" {
-				server.ESLPassword = "ClueCon"
+				AllServers[i].ESLPassword = "ClueCon"
 			}
 			if server.ESLPort == "" {
-				server.ESLPort = "8021"
+				AllServers[i].ESLPort = "8021"
 			}
-			newServers = append(newServers, server)
 		}
 	}
-	copy(Servers, newServers)
-	//WARNING !! Triggering reconnection for all servers !!
-	//fsServerReload <- "reload"
-	return Servers
+	return AllServers
 }
 
 // ConnectWithFsServers - Iterates over the provided List of FreeSWITCH Server 'dispatcher' table
