@@ -164,10 +164,10 @@ func HandleAMQPCommands(d amqp.Delivery) {
 }
 
 // LoadfreeSWITCHBoxes - Servers Loads FreeSWITCH Boxes from Database table dispatcher
-func LoadfreeSWITCHBoxes() []helpers.FSServers {
+func LoadfreeSWITCHBoxes(cfgs helpers.Config) []helpers.FSServers {
 	CallCount = 0
 	var AllServers []helpers.FSServers
-	temp := helpers.FSServers{NodeName: LConfig.FreeSWITCHInstance.Host, Host: LConfig.FreeSWITCHInstance.Host, ESLEventsList: LConfig.FreeSWITCHInstance.EventList, ESLFormat: "json", ESLPassword: LConfig.FreeSWITCHInstance.Password, ESLPort: LConfig.FreeSWITCHInstance.Port}
+	temp := helpers.FSServers{NodeName: cfgs.FreeSWITCHInstance.Host, Host: cfgs.FreeSWITCHInstance.Host, ESLEventsList: cfgs.FreeSWITCHInstance.EventList, ESLFormat: "json", ESLPassword: cfgs.FreeSWITCHInstance.Password, ESLPort: cfgs.FreeSWITCHInstance.Port}
 
 	AllServers = append(AllServers, temp)
 	var newServers []helpers.FSServers
@@ -202,7 +202,7 @@ func ConnectWithFsServers(cfgs helpers.Config) {
 			go ConnectWithFsServers(cfgs)
 		}
 	}()
-	Servers = LoadfreeSWITCHBoxes()
+	Servers = LoadfreeSWITCHBoxes(cfgs)
 	log.Printf("[ConnectWithFsServers] Servers to Connect:%+v\n", Servers)
 	var host string
 	var ok bool
