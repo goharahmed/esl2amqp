@@ -156,7 +156,7 @@ func HandleAMQPCommands(d amqp.Delivery) {
 	}
 	var cmd CommandData
 	cmd.Command = command["command"].(string)
-	cmd.Host = LConfig.AMQPInfo.Host
+	cmd.Host = LConfig.FreeSWITCHInstance.Host
 	cmd.ID = int64(uuid.New().ID())
 	response, err := ExecuteCommand(cmd)
 	if err != nil {
