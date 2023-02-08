@@ -311,6 +311,7 @@ func serverEvents(fsServer helpers.FreeSwitchServer, c eventsocket.Connection) {
 
 		if ev != nil {
 			ev.String()
+			log.Printf("[serverEvets] Publishing Event:%s\n", ev.String())
 			//SEND THIS EVENT OVER TO AMQP PUBLISHER.
 			AmqpClient.Publish([]byte(ev.String()), LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
 		}
