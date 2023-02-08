@@ -140,7 +140,7 @@ var AmqpClient helpers.MessagingClient
 
 // ConnectAMQP - AMQP message bus connection
 func ConnectAMQP(cfg helpers.Config) {
-	amqpurl := "amqp://" + cfg.AMQPInfo.User + ":" + cfg.AMQPInfo.Pass + "@" + cfg.AMQPInfo.Host + ":" + cfg.AMQPInfo.Port + cfg.AMQPInfo.VHost
+	amqpurl := "amqps://" + cfg.AMQPInfo.User + ":" + cfg.AMQPInfo.Pass + "@" + cfg.AMQPInfo.Host + ":" + cfg.AMQPInfo.Port + cfg.AMQPInfo.VHost
 	AmqpClient.ConnectToBroker(amqpurl)
 }
 
