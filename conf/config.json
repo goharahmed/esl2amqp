@@ -1,0 +1,22 @@
+{
+    "api" : {
+        "pihost":"127.0.0.1",
+        "piport" : "2024"
+    },
+    "amqp" : {
+        "hostname" : "b-8b56bece-c6e9-4c74-a534-b9da4a2464b5.mq.ap-southeast-1.amazonaws.com",
+        "port" : "5671",
+        "virtual_host" : "/",
+        "username" : "stagingfl02",
+        "password" : "aNCLJI3X8400",
+        "events_exchange" : "TAP.Events",
+        "commands_exchange" : "TAP.Commands"
+
+    },
+    "freeswitch" : {
+        "host":"127.0.0.1",
+        "port":"8021",
+        "password":"ClueCon",
+        "timeout":6
+    }
+}

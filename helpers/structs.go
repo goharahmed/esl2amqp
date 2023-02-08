@@ -26,15 +26,9 @@ type AMQP struct {
 
 // Config - Structure to Load the json file
 type Config struct {
-	APIInfo                   Webapi           `json:"api"`
-	PushNotificationURL       string           `json:"pn_url"`
-	MissedPushNotificationURL string           `json:"pn_missed_url"`
-	DebugPushAPI              bool             `json:"api_pn_debug"`
-	APIAuthToken              string           `json:"api_token"`
-	DatabaseInfo              Database         `json:"database"`
-	RingTimeout               int              `json:"ring_timeout"`
-	AMQPInfo                  AMQP             `json:"amqp"`
-	FreeSWITCHInstance        FreeSwitchServer `json:"freeswitch"`
+	APIInfo            Webapi           `json:"api"`
+	AMQPInfo           AMQP             `json:"amqp"`
+	FreeSWITCHInstance FreeSwitchServer `json:"freeswitch"`
 }
 
 // FreeSwitchServer - FS Server array to hold config of each FS ESL
