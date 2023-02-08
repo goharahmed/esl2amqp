@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
-	"strings"
 	"sync"
 	"time"
 
@@ -204,18 +203,11 @@ func ConnectWithFsServers(cfgs helpers.Config) {
 		}
 	}()
 	Servers = LoadfreeSWITCHBoxes()
+	log.Printf("[ConnectWithFsServers] Servers to Connect:%+v\n", Servers)
 	var host string
 	var ok bool
 	commandID = 0
 	//Broadcasting Channel creation for Commands
-	MsgBroker = NewBroker()
-	EventBroker = NewBroker()
-	APIResponses = NewBroker()
-	go APIResponses.Start()
-	go EventBroker.Start()
-	go MsgBroker.Start()
-	go MsgBroker.StartCommandChannel()
-
 	for {
 		for id, oneServer := range Servers {
 			var fsServer helpers.FreeSwitchServer
@@ -376,27 +368,4 @@ func StartBrokers() {
 	go EventBroker.Start()
 	go MsgBroker.Start()
 	go MsgBroker.StartCommandChannel()
-	go handleCommandResponses()
-}
-
-func handleCommandResponses() {
-	response := APIResponses.Subscribe()
-	defer APIResponses.Unsubscribe(response)
-	for {
-		select {
-		//case of event coming through
-		case event := <-response:
-			jargs := event.Event.Get("Job-Command-Arg")
-			job := strings.Split(jargs, "Job-UUID: ")
-			if len(job) > 1 {
-				jUUID := job[1]
-				//log.Printf("Saving Reply for Job-UUID:%s\n", jUUID)
-				CommandResponseLock.Lock()
-				CommandResponses[jUUID] = event.Event
-				CommandResponseLock.Unlock()
-				/* } else {
-				log.Printf("UnMatched Reply: %+v", event) */
-			}
-		}
-	}
 }
