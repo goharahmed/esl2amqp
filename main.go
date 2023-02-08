@@ -17,6 +17,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	go lib.ConnectWithFsServers(lib.LConfig)
 
 	//log.Println("[Initialization] Configurations: %+v\n", lib.Config)
 	//lib.ConnectMySQL(lib.LConfig)
@@ -25,7 +26,6 @@ func init() {
 	go lib.AmqpClient.Subscribe(lib.LConfig.AMQPInfo.CommandExchange, "topic", lib.LConfig.FreeSWITCHInstance.Host, lib.LConfig.AMQPInfo.CommandExchange, lib.HandleAMQPCommands)
 
 	go lib.StartBrokers()
-	go lib.ConnectWithFsServers(lib.LConfig)
 }
 
 func main() {
