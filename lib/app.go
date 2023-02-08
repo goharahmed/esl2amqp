@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/goharahmed/go-eventsocket/eventsocket"
+	"github.com/google/uuid"
 	"github.com/streadway/amqp"
 )
 
@@ -147,16 +148,19 @@ func ConnectAMQP(cfg helpers.Config) {
 func HandleAMQPCommands(d amqp.Delivery) {
 	body := d.Body
 	//event := &ExtractedEvent{}
-	event := make(map[string]interface{})
-	err := json.Unmarshal(body, &event)
+	command := make(map[string]interface{})
+	err := json.Unmarshal(body, &command)
 	if err != nil {
-		log.Printf("[HandleAMQPEvents] Problem parsing event: %v", err.Error())
+		log.Printf("[HandleAMQPCommands] Problem parsing event: %v", err.Error())
 		return
 	}
 	var cmd CommandData
+	cmd.Command = command["command"].(string)
+	cmd.Host = LConfig.AMQPInfo.Host
+	cmd.ID = int64(uuid.New().ID())
 	response, err := ExecuteCommand(cmd)
 	if err != nil {
-		log.Printf("[HandleAMQPEvents] Problem executing command: %v", err)
+		log.Printf("[HandleAMQPCommands] Problem executing command: %v", err)
 		return
 	} else {
 		AmqpClient.Publish([]byte(response.String()), LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
