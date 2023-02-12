@@ -156,15 +156,12 @@ func HandleAMQPCommands(d amqp.Delivery) {
 	}
 	var cmd CommandData
 	cmd.Command = command["command"].(string)
+	if juuid, ok := command["job-uuid"].(string); ok {
+		cmd.Command = cmd.Command + "\r\n" + "job-uuid: " + juuid
+	}
 	cmd.Host = LConfig.FreeSWITCHInstance.Host
 	cmd.ID = int64(uuid.New().ID())
-	response, err := ExecuteCommand(cmd)
-	if err != nil {
-		log.Printf("[HandleAMQPCommands] Problem executing command: %v", err)
-		return
-	} else {
-		AmqpClient.Publish([]byte(response.String()), LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
-	}
+	ExecuteCommand(cmd)
 }
 
 // LoadfreeSWITCHBoxes - Servers Loads FreeSWITCH Boxes from Database table dispatcher
@@ -290,8 +287,21 @@ func ConnectWithFsServer(id int64, fsServer helpers.FreeSwitchServer, fsServerCh
 	thisServer := Server{id, CommandsChannel, ResponseChannel, c, true}
 
 	LiveServers[fsServer.Host] = thisServer
+	go serverCommands(thisServer, *c)
 	serverEvents(fsServer, *c)
 
+}
+func serverCommands(fsServer Server, c eventsocket.Connection) {
+	for {
+		select {
+		case cmd := <-fsServer.CommandChannel:
+			log.Printf("[serverCommands] Got Command to Execute: %+v\n", cmd)
+			_, err := fsServer.Conn.Send(cmd.Command)
+			if err != nil {
+				log.Printf("[serverCommands] Error Received for Command:%s to As: %+v\n", cmd.Command, err)
+			}
+		}
+	}
 }
 
 // serverEvents - listens to all events from a specific channel and sends those messages to a channel
@@ -305,12 +315,12 @@ func serverEvents(fsServer helpers.FreeSwitchServer, c eventsocket.Connection) {
 		//reads events as they come in and if they are not an error it sends them to the eventChannel
 		ev, err := c.ReadEvent()
 		if err != nil {
-			//log.Printf("[ESL Event Handler] Error:%s Server:%s", err, fsServer.Host)
+			log.Printf("[ESL Event Handler] Error:%s Server:%s", err, fsServer.Host)
 			fsServerCh <- fsServer.Host
 		}
 
 		if ev != nil {
-			ev.String()
+			//ev.String()
 			log.Printf("[serverEvets] Publishing Event:%s\n", ev.String())
 			//SEND THIS EVENT OVER TO AMQP PUBLISHER.
 			AmqpClient.Publish([]byte(ev.String()), LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
@@ -319,18 +329,13 @@ func serverEvents(fsServer helpers.FreeSwitchServer, c eventsocket.Connection) {
 }
 
 // ExecuteCommand  -    (inputs inpType)   (outputType1,outputType2...)
-func ExecuteCommand(params CommandData) (*eventsocket.Event, error) {
+func ExecuteCommand(params CommandData) { //} (*eventsocket.Event, error) {
 
-	data := CommandData{}
-	respCh := MsgBroker.Subscribe()
-	defer MsgBroker.Unsubscribe(respCh)
-
-	data.Command = params.Command
-	data.Host = params.Host
-	data.ID = params.ID
-	log.Printf("[ExecuteComman] Command:%+v LiveServers:%+v\n", params, LiveServers)
-	response, err := LiveServers[params.Host].Conn.Send(params.Command)
-	return response, err
+	xdata := Commands{}
+	xdata.Command = params.Command
+	xdata.ID = params.ID
+	LiveServers[params.Host].CommandChannel <- xdata
+	//	return response, err
 
 }
 
