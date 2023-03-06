@@ -1,0 +1,22 @@
+# github.com/go-sql-driver/mysql v1.7.0
+## explicit; go 1.13
+github.com/go-sql-driver/mysql
+# github.com/goharahmed/go-eventsocket v0.0.0-20211009174259-bc6d86e08518
+## explicit
+github.com/goharahmed/go-eventsocket/eventsocket
+# github.com/google/uuid v1.3.0
+## explicit
+github.com/google/uuid
+# github.com/gorilla/mux v1.8.0
+## explicit; go 1.12
+github.com/gorilla/mux
+# github.com/jmoiron/sqlx v1.3.5
+## explicit; go 1.10
+# github.com/lib/pq v1.10.7
+## explicit; go 1.13
+# github.com/rs/cors v1.8.3
+## explicit; go 1.13
+github.com/rs/cors
+# github.com/streadway/amqp v1.0.0
+## explicit; go 1.10
+github.com/streadway/amqp
