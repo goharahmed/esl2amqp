@@ -151,7 +151,7 @@ func HandleAMQPCommands(d amqp.Delivery) {
 	command := make(map[string]interface{})
 	err := json.Unmarshal(body, &command)
 	if err != nil {
-		log.Printf("[HandleAMQPCommands] Problem parsing event: %v", err.Error())
+		log.Printf("[HandleAMQPCommands] Problem parsing event: %v Object-Received:%+v\n", err.Error(), string(body))
 		return
 	}
 	var cmd CommandData
@@ -295,7 +295,7 @@ func serverCommands(fsServer Server, c eventsocket.Connection) {
 	for {
 		select {
 		case cmd := <-fsServer.CommandChannel:
-			log.Printf("[serverCommands] Got Command to Execute: %+v\n", cmd)
+			//log.Printf("[serverCommands] Got Command to Execute: %+v\n", cmd)
 			_, err := fsServer.Conn.Send(cmd.Command)
 			if err != nil {
 				log.Printf("[serverCommands] Error Received for Command:%s to As: %+v\n", cmd.Command, err)
@@ -321,9 +321,17 @@ func serverEvents(fsServer helpers.FreeSwitchServer, c eventsocket.Connection) {
 
 		if ev != nil {
 			//ev.String()
-			log.Printf("[serverEvets] Publishing Event:%s\n", ev.String())
 			//SEND THIS EVENT OVER TO AMQP PUBLISHER.
-			AmqpClient.Publish([]byte(ev.String()), LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
+			jsonEvent, err := json.Marshal(ev)
+			if err != nil {
+				log.Printf("[serverEvets] Error Publishing Event:%s\n", err)
+			} else {
+				//log.Printf("[serverEvets] Publishing Event:%s\n", string(jsonEvent))
+				err = AmqpClient.Publish(jsonEvent, LConfig.AMQPInfo.EventsExchange, "topic", "", "*.*.*.*.*")
+				if err != nil {
+					log.Printf("[serverEvets] Error Publishing Event:%s\n", err)
+				}
+			}
 		}
 	}
 }
